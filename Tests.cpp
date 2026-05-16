@@ -23,7 +23,7 @@ bool isInsideBoard(const std::pair<int, int>& position) {
 }
 }  // namespace
 
-int main() {
+int runSnakeTests() {
     int passed = 0;
     int failed = 0;
 
@@ -76,3 +76,9 @@ int main() {
 
     return failed == 0 ? 0 : 1;
 }
+
+#ifdef RUN_SNAKE_TESTS
+int main() {
+    return runSnakeTests();
+}
+#endif
