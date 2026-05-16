@@ -40,25 +40,43 @@ int main() {
     Game game;
     game.startGame();
 
-    // Use a common Linux font path for score/game-over text rendering.
+    // Try common font locations across Linux/Windows/macOS.
+    // If none is found, the game still runs (without text rendering).
     sf::Font font;
-    if (!font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")) {
-        std::cerr << "Failed to load font.\n";
-        return 1;
+    bool hasFont = false;
+    const std::string fontPaths[] = {
+        "DejaVuSans.ttf",
+        "arial.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "C:/Windows/Fonts/arial.ttf",
+        "/System/Library/Fonts/Supplemental/Arial.ttf"
+    };
+    for (const std::string& path : fontPaths) {
+        if (font.loadFromFile(path)) {
+            hasFont = true;
+            break;
+        }
+    }
+    if (!hasFont) {
+        std::cerr << "Warning: no font found; score text will be hidden.\n";
     }
 
     sf::Text scoreText;
-    scoreText.setFont(font);
-    scoreText.setCharacterSize(24);
-    scoreText.setFillColor(sf::Color::White);
-    scoreText.setPosition(10.f, 12.f);
+    if (hasFont) {
+        scoreText.setFont(font);
+        scoreText.setCharacterSize(24);
+        scoreText.setFillColor(sf::Color::White);
+        scoreText.setPosition(10.f, 12.f);
+    }
 
     sf::Text gameOverText;
-    gameOverText.setFont(font);
-    gameOverText.setCharacterSize(24);
-    gameOverText.setFillColor(sf::Color::Red);
-    gameOverText.setString("Game Over - Press R to restart");
-    gameOverText.setPosition(110.f, 12.f);
+    if (hasFont) {
+        gameOverText.setFont(font);
+        gameOverText.setCharacterSize(24);
+        gameOverText.setFillColor(sf::Color::Red);
+        gameOverText.setString("Game Over - Press R to restart");
+        gameOverText.setPosition(110.f, 12.f);
+    }
 
     // Reused rectangle for drawing snake and food cells.
     sf::RectangleShape cellShape(sf::Vector2f(
@@ -152,11 +170,13 @@ int main() {
         );
         window.draw(cellShape);
 
-        // Draw score and game-over message in the HUD.
-        scoreText.setString("Score: " + std::to_string(game.getScore()));
-        window.draw(scoreText);
-        if (game.isGameOver()) {
-            window.draw(gameOverText);
+        // Draw score and game-over message in the HUD if a font is available.
+        if (hasFont) {
+            scoreText.setString("Score: " + std::to_string(game.getScore()));
+            window.draw(scoreText);
+            if (game.isGameOver()) {
+                window.draw(gameOverText);
+            }
         }
 
         window.display();
