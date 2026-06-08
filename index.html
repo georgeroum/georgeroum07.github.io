@@ -1,15 +1,1157 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-<title>Carson Carey Resume</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Warzone Royale - Terminal Battle Royale</title>
+  <style>
+    :root {
+      --bg: #07090c;
+      --panel: #10151d;
+      --panel-2: #151b25;
+      --red: #d12929;
+      --red-soft: #7a1d1d;
+      --green: #76ff8a;
+      --amber: #ffcb5a;
+      --blue: #68a5ff;
+      --text: #d6dde8;
+      --muted: #77808d;
+      --line: #273241;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(209, 41, 41, 0.22), transparent 34rem),
+        radial-gradient(circle at 90% 20%, rgba(104, 165, 255, 0.12), transparent 28rem),
+        linear-gradient(135deg, #030406 0%, #0d1118 52%, #050608 100%);
+      color: var(--text);
+      font-family: "Courier New", Courier, monospace;
+    }
+
+    .app {
+      width: min(1220px, calc(100vw - 24px));
+      margin: 0 auto;
+      padding: 18px 0 28px;
+    }
+
+    .topbar,
+    .panel,
+    .battlefield-wrap {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(21, 27, 37, 0.96), rgba(9, 12, 17, 0.96));
+      box-shadow: 0 0 0 1px rgba(209, 41, 41, 0.11), 0 24px 70px rgba(0, 0, 0, 0.48);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 18px;
+      border-left: 5px solid var(--red);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--red);
+      background: #18090a;
+      color: var(--red);
+      font-weight: 900;
+      font-size: 26px;
+      text-shadow: 0 0 18px rgba(209, 41, 41, 0.8);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 42px);
+      line-height: 1;
+      color: #f2f4f7;
+      text-shadow: 0 0 18px rgba(209, 41, 41, 0.65);
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .status-light {
+      color: var(--green);
+      white-space: nowrap;
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 330px;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .battlefield-wrap {
+      position: relative;
+      min-height: 640px;
+      overflow: hidden;
+    }
+
+    .scanlines::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.028) 0,
+        rgba(255, 255, 255, 0.028) 1px,
+        transparent 1px,
+        transparent 4px
+      );
+      mix-blend-mode: screen;
+    }
+
+    #field {
+      margin: 0;
+      padding: 18px;
+      min-height: 640px;
+      color: #cfd8dc;
+      font-size: clamp(12px, 1.3vw, 16px);
+      line-height: 1.08;
+      letter-spacing: 0.04em;
+      white-space: pre;
+      text-shadow: 0 0 8px rgba(118, 255, 138, 0.2);
+      user-select: none;
+    }
+
+    .sidebar {
+      display: grid;
+      gap: 14px;
+    }
+
+    .panel {
+      padding: 14px;
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      color: #f3f5f8;
+      font-size: 15px;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 8px;
+    }
+
+    .hud-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 7px 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .hud-row strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .bar {
+      height: 12px;
+      border: 1px solid #354253;
+      background: #05070a;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+
+    .bar > span {
+      display: block;
+      height: 100%;
+      transition: width 0.15s linear;
+    }
+
+    .hp > span {
+      background: linear-gradient(90deg, #801919, #e63a3a);
+    }
+
+    .shield > span {
+      background: linear-gradient(90deg, #1f4a85, #68a5ff);
+    }
+
+    .weapon-list {
+      display: grid;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .weapon-slot {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      border: 1px solid #283445;
+      background: rgba(5, 7, 10, 0.5);
+      padding: 7px 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .weapon-slot.active {
+      color: #fff;
+      border-color: var(--red);
+      box-shadow: inset 3px 0 0 var(--red);
+      background: rgba(122, 29, 29, 0.25);
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    kbd {
+      display: inline-block;
+      min-width: 24px;
+      padding: 2px 5px;
+      border: 1px solid #3a4554;
+      background: #080b10;
+      color: #f7f8fa;
+      text-align: center;
+      box-shadow: inset 0 -2px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    #log {
+      min-height: 190px;
+      max-height: 190px;
+      overflow: hidden;
+      margin: 0;
+      color: #aab3bf;
+      font-size: 12px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+
+    .deploy {
+      width: 100%;
+      margin-top: 10px;
+      padding: 11px 14px;
+      border: 1px solid var(--red);
+      background: linear-gradient(180deg, #7a1d1d, #370d0d);
+      color: #fff;
+      font: 800 13px "Courier New", Courier, monospace;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .deploy:hover,
+    .deploy:focus {
+      outline: none;
+      filter: brightness(1.18);
+    }
+
+    .legend {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 5px 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .legend b {
+      color: #fff;
+    }
+
+    .red {
+      color: var(--red);
+    }
+
+    .amber {
+      color: var(--amber);
+    }
+
+    .green {
+      color: var(--green);
+    }
+
+    @media (max-width: 920px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .battlefield-wrap,
+      #field {
+        min-height: 520px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
-<body style = "background-color:LavenderBlush;">
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">W</div>
+        <div>
+          <h1>Warzone Royale</h1>
+          <div class="subtitle">terminal battle royale // tactical extraction channel</div>
+        </div>
+      </div>
+      <div class="status-light" id="statusLine">Awaiting deployment</div>
+    </header>
 
-<img src = "John.jpg" width = 100% height = 300>
+    <section class="grid" aria-label="Warzone Royale game">
+      <div class="battlefield-wrap scanlines">
+        <pre id="field" aria-live="polite"></pre>
+      </div>
 
-<strong><header style = "text-align:center; font-size:75px;">Justin Terrero's Resume</header></strong>
-<section style = "color:black; background-color:white; text-align:center; font-size:50px;">I am a major influence and Instagram Track Athlete that lives on Long Island and has traveled tyhe world helping those who need it and helped create numerous Track Camps to help those who can't make it to other camps.</section>
+      <aside class="sidebar">
+        <section class="panel">
+          <h2>Operator HUD</h2>
+          <div class="hud-row"><span>Health</span><strong id="hpText">100</strong></div>
+          <div class="bar hp"><span id="hpBar" style="width: 100%"></span></div>
+          <div class="hud-row"><span>Shield</span><strong id="shieldText">25</strong></div>
+          <div class="bar shield"><span id="shieldBar" style="width: 25%"></span></div>
+          <div class="hud-row"><span>Ammo</span><strong id="ammoText">45</strong></div>
+          <div class="hud-row"><span>Medkits</span><strong id="medkitText">1</strong></div>
+          <div class="hud-row"><span>Grenades</span><strong id="grenadeText">1</strong></div>
+          <div class="hud-row"><span>Materials</span><strong id="materialText">W20 / S10 / M5</strong></div>
+          <div class="hud-row"><span>Operators left</span><strong id="leftText">--</strong></div>
+          <div class="hud-row"><span>Safe zone</span><strong id="zoneText">--</strong></div>
+          <button class="deploy" id="deployBtn" type="button">Deploy / Restart</button>
+        </section>
 
+        <section class="panel">
+          <h2>Weapons</h2>
+          <div class="weapon-list" id="weaponList"></div>
+        </section>
 
+        <section class="panel">
+          <h2>Controls</h2>
+          <div class="controls">
+            <span><kbd>WASD</kbd> move</span>
+            <span><kbd>F</kbd> shoot</span>
+            <span><kbd>B</kbd> build</span>
+            <span><kbd>G</kbd> grenade</span>
+            <span><kbd>H</kbd> medkit</span>
+            <span><kbd>Q/E</kbd> swap</span>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Legend</h2>
+          <div class="legend">
+            <span><b>@</b> you</span>
+            <span><b>?</b> unaware enemy</span>
+            <span><b>!</b> alerted enemy</span>
+            <span><b>#</b> wall</span>
+            <span><b>w</b> weapon</span>
+            <span><b>+</b> medkit</span>
+            <span><b>.</b> ammo</span>
+            <span><b>s</b> shield</span>
+            <span><b>m</b> materials</span>
+            <span><b>:</b> gas</span>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Combat Log</h2>
+          <pre id="log">Press Enter or Deploy to drop into the AO.</pre>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const WIDTH = 48;
+      const HEIGHT = 26;
+      const ENEMY_COUNT = 22;
+      const LOOT_COUNT = 58;
+      const TICK_MS = 170;
+      const ZONE_SHRINK_TICKS = 80;
+
+      const field = document.getElementById("field");
+      const deployBtn = document.getElementById("deployBtn");
+      const logPanel = document.getElementById("log");
+      const statusLine = document.getElementById("statusLine");
+
+      const hud = {
+        hpText: document.getElementById("hpText"),
+        hpBar: document.getElementById("hpBar"),
+        shieldText: document.getElementById("shieldText"),
+        shieldBar: document.getElementById("shieldBar"),
+        ammoText: document.getElementById("ammoText"),
+        medkitText: document.getElementById("medkitText"),
+        grenadeText: document.getElementById("grenadeText"),
+        materialText: document.getElementById("materialText"),
+        leftText: document.getElementById("leftText"),
+        zoneText: document.getElementById("zoneText"),
+        weaponList: document.getElementById("weaponList")
+      };
+
+      const WEAPONS = {
+        Pistol: { name: "Pistol", damage: 18, range: 7, ammoCost: 0, noise: 8, tag: "sidearm" },
+        M4A1: { name: "M4A1", damage: 28, range: 11, ammoCost: 2, noise: 12, tag: "rifle" },
+        "AK-47": { name: "AK-47", damage: 34, range: 10, ammoCost: 2, noise: 13, tag: "rifle" },
+        MP5: { name: "MP5", damage: 22, range: 8, ammoCost: 2, noise: 10, tag: "smg" },
+        Sniper: { name: "Sniper", damage: 62, range: 17, ammoCost: 3, noise: 17, tag: "marksman" },
+        Shotgun: { name: "Shotgun", damage: 48, range: 5, ammoCost: 2, noise: 11, tag: "breach" },
+        RPG: { name: "RPG", damage: 76, range: 12, ammoCost: 5, noise: 18, tag: "launcher" }
+      };
+
+      const WEAPON_POOL = ["M4A1", "AK-47", "MP5", "Sniper", "Shotgun", "RPG"];
+      const OPERATORS = [
+        "Ghost", "Price", "Soap", "Makarov", "Gaz", "Farah", "Alex", "Yuri",
+        "Roach", "Nikolai", "Woods", "Mason", "Kamarov", "Laswell", "Raines",
+        "Hesh", "Keegan", "Griggs", "Ajax", "Nomad", "Reaper", "Spectre"
+      ];
+
+      let state = null;
+      let loopId = null;
+
+      function randInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function pick(list) {
+        return list[randInt(0, list.length - 1)];
+      }
+
+      function key(x, y) {
+        return `${x},${y}`;
+      }
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function distance(a, b) {
+        return Math.hypot(a.x - b.x, a.y - b.y);
+      }
+
+      function weaponCopy(name) {
+        return { ...WEAPONS[name] };
+      }
+
+      function titleScreen() {
+        field.textContent = [
+          "================================================================",
+          "                         WARZONE ROYALE                         ",
+          "================================================================",
+          "",
+          "           TERMINAL AO // DARK COMMS // LAST SQUAD WINS          ",
+          "",
+          "    Drop in, loot fast, build cover, outrun the gas, survive.",
+          "",
+          "    WASD move   F fire   B build   G grenade   H medkit",
+          "    Q/E swap weapons     ENTER deploy     R restart after death",
+          "",
+          "    Loot: w weapon  + medkit  . ammo  s shield  m materials",
+          "",
+          "================================================================",
+          "                       PRESS ENTER TO DEPLOY                     ",
+          "================================================================"
+        ].join("\n");
+        statusLine.textContent = "Awaiting deployment";
+      }
+
+      function emptyState() {
+        return {
+          mode: "playing",
+          tick: 0,
+          terrain: [],
+          enemies: [],
+          loot: [],
+          walls: new Map(),
+          particles: [],
+          logs: [],
+          safe: {
+            x: Math.floor(WIDTH / 2),
+            y: Math.floor(HEIGHT / 2),
+            radius: 18,
+            next: ZONE_SHRINK_TICKS
+          },
+          player: {
+            x: Math.floor(WIDTH / 2),
+            y: Math.floor(HEIGHT / 2),
+            hp: 100,
+            shield: 25,
+            ammo: 45,
+            medkits: 1,
+            grenades: 1,
+            kills: 0,
+            lastDir: { x: 0, y: -1 },
+            materials: { wood: 20, stone: 10, metal: 5 },
+            weaponIndex: 0,
+            weaponSlots: [weaponCopy("Pistol"), null, null]
+          }
+        };
+      }
+
+      function startGame() {
+        state = emptyState();
+        buildTerrain();
+        spawnEnemies();
+        spawnLoot(LOOT_COUNT);
+        addLog("Night drop confirmed. Secure weapons and stay inside the circle.");
+        addLog("Intel: enemies marked ? have not seen you. ! means contact.");
+        clearInterval(loopId);
+        loopId = setInterval(gameTick, TICK_MS);
+        render();
+      }
+
+      function buildTerrain() {
+        state.terrain = Array.from({ length: HEIGHT }, (_, y) => {
+          return Array.from({ length: WIDTH }, (_, x) => {
+            if (x === 0 || y === 0 || x === WIDTH - 1 || y === HEIGHT - 1) return "X";
+            const roll = Math.random();
+            if (roll < 0.025) return ",";
+            if (roll < 0.05) return "`";
+            return " ";
+          });
+        });
+      }
+
+      function randomOpenPosition() {
+        for (let tries = 0; tries < 1200; tries += 1) {
+          const x = randInt(2, WIDTH - 3);
+          const y = randInt(2, HEIGHT - 3);
+          if (state.player && state.player.x === x && state.player.y === y) continue;
+          if (state.walls.has(key(x, y))) continue;
+          if (state.enemies.some((enemy) => enemy.alive && enemy.x === x && enemy.y === y)) continue;
+          if (state.loot.some((item) => item.x === x && item.y === y)) continue;
+          return { x, y };
+        }
+        return { x: randInt(2, WIDTH - 3), y: randInt(2, HEIGHT - 3) };
+      }
+
+      function spawnEnemies() {
+        const names = [...OPERATORS].sort(() => Math.random() - 0.5);
+        for (let i = 0; i < ENEMY_COUNT; i += 1) {
+          const pos = randomOpenPosition();
+          const weapon = weaponCopy(pick(["Pistol", "M4A1", "AK-47", "MP5", "Shotgun"]));
+          state.enemies.push({
+            ...pos,
+            name: names[i] || `Operator-${i + 1}`,
+            hp: randInt(65, 95),
+            weapon,
+            alive: true,
+            alerted: false,
+            cooldown: randInt(2, 8),
+            wander: { x: 0, y: 0 }
+          });
+        }
+      }
+
+      function spawnLoot(count) {
+        for (let i = 0; i < count; i += 1) {
+          spawnLootItem(randomOpenPosition());
+        }
+      }
+
+      function spawnLootItem(pos, forcedType) {
+        const roll = Math.random();
+        let type = forcedType;
+        if (!type) {
+          if (roll < 0.26) type = "weapon";
+          else if (roll < 0.45) type = "ammo";
+          else if (roll < 0.61) type = "shield";
+          else if (roll < 0.78) type = "materials";
+          else type = "medkit";
+        }
+
+        const item = { ...pos, type };
+        if (type === "weapon") {
+          item.symbol = "w";
+          item.weapon = weaponCopy(pick(WEAPON_POOL));
+        } else if (type === "ammo") {
+          item.symbol = ".";
+          item.amount = randInt(12, 28);
+        } else if (type === "shield") {
+          item.symbol = "s";
+          item.amount = randInt(20, 40);
+        } else if (type === "materials") {
+          item.symbol = "m";
+          item.wood = randInt(8, 18);
+          item.stone = randInt(4, 12);
+          item.metal = randInt(2, 8);
+        } else {
+          item.symbol = "+";
+        }
+        state.loot.push(item);
+      }
+
+      function addLog(message) {
+        if (!state) return;
+        state.logs.unshift(`T+${String(state.tick).padStart(3, "0")} ${message}`);
+        state.logs = state.logs.slice(0, 9);
+      }
+
+      function currentWeapon() {
+        return state.player.weaponSlots[state.player.weaponIndex] || state.player.weaponSlots[0];
+      }
+
+      function aliveEnemies() {
+        return state.enemies.filter((enemy) => enemy.alive);
+      }
+
+      function inBounds(x, y) {
+        return x > 0 && y > 0 && x < WIDTH - 1 && y < HEIGHT - 1;
+      }
+
+      function isOccupiedByEnemy(x, y) {
+        return state.enemies.some((enemy) => enemy.alive && enemy.x === x && enemy.y === y);
+      }
+
+      function passable(x, y, ignoreEnemies = false) {
+        if (!inBounds(x, y)) return false;
+        if (state.walls.has(key(x, y))) return false;
+        if (!ignoreEnemies && isOccupiedByEnemy(x, y)) return false;
+        return true;
+      }
+
+      function insideZone(x, y) {
+        return Math.hypot(x - state.safe.x, y - state.safe.y) <= state.safe.radius;
+      }
+
+      function lineBlocked(x0, y0, x1, y1) {
+        let dx = Math.abs(x1 - x0);
+        let dy = Math.abs(y1 - y0);
+        const sx = x0 < x1 ? 1 : -1;
+        const sy = y0 < y1 ? 1 : -1;
+        let err = dx - dy;
+        let x = x0;
+        let y = y0;
+
+        while (!(x === x1 && y === y1)) {
+          const twice = err * 2;
+          if (twice > -dy) {
+            err -= dy;
+            x += sx;
+          }
+          if (twice < dx) {
+            err += dx;
+            y += sy;
+          }
+          if (x === x1 && y === y1) break;
+          if (state.walls.has(key(x, y))) return true;
+        }
+        return false;
+      }
+
+      function movePlayer(dx, dy) {
+        if (state.mode !== "playing") return;
+        state.player.lastDir = { x: dx, y: dy };
+        const nx = state.player.x + dx;
+        const ny = state.player.y + dy;
+        if (!passable(nx, ny)) {
+          addLog("Movement blocked.");
+          render();
+          return;
+        }
+        state.player.x = nx;
+        state.player.y = ny;
+        collectLoot();
+        render();
+      }
+
+      function collectLoot() {
+        const index = state.loot.findIndex((item) => item.x === state.player.x && item.y === state.player.y);
+        if (index === -1) return;
+
+        const [item] = state.loot.splice(index, 1);
+        const player = state.player;
+        if (item.type === "weapon") {
+          const emptySlot = player.weaponSlots.findIndex((slot) => !slot);
+          if (emptySlot !== -1) {
+            player.weaponSlots[emptySlot] = item.weapon;
+            player.weaponIndex = emptySlot;
+            addLog(`Looted ${item.weapon.name}. Slot ${emptySlot + 1} active.`);
+          } else {
+            player.weaponSlots[player.weaponIndex] = item.weapon;
+            addLog(`Swapped active weapon for ${item.weapon.name}.`);
+          }
+        } else if (item.type === "ammo") {
+          player.ammo += item.amount;
+          addLog(`Recovered ${item.amount} rounds.`);
+        } else if (item.type === "shield") {
+          player.shield = clamp(player.shield + item.amount, 0, 100);
+          addLog(`Shield plates restored +${item.amount}.`);
+        } else if (item.type === "materials") {
+          player.materials.wood += item.wood;
+          player.materials.stone += item.stone;
+          player.materials.metal += item.metal;
+          addLog(`Materials acquired W${item.wood}/S${item.stone}/M${item.metal}.`);
+        } else {
+          player.medkits += 1;
+          addLog("Medkit secured.");
+        }
+      }
+
+      function shoot() {
+        if (state.mode !== "playing") return;
+        const weapon = currentWeapon();
+        if (!weapon) return;
+        if (weapon.ammoCost > 0 && state.player.ammo < weapon.ammoCost) {
+          addLog(`${weapon.name} dry. Swap weapons or find ammo.`);
+          render();
+          return;
+        }
+
+        const target = nearestVisibleEnemy(weapon.range);
+        if (!target) {
+          alertNearbyEnemies(weapon.noise);
+          addParticle(state.player.x + state.player.lastDir.x, state.player.y + state.player.lastDir.y, "*", 2);
+          addLog(`${weapon.name} fired. No target in clean line.`);
+          spendAmmo(weapon);
+          render();
+          return;
+        }
+
+        spendAmmo(weapon);
+        alertNearbyEnemies(weapon.noise);
+        target.alerted = true;
+
+        let damage = randInt(Math.floor(weapon.damage * 0.75), Math.ceil(weapon.damage * 1.2));
+        if (weapon.name === "Shotgun") damage += Math.max(0, 5 - Math.floor(distance(state.player, target))) * 5;
+        target.hp -= damage;
+        addParticle(target.x, target.y, "x", 3);
+        addParticle(state.player.x, state.player.y, "*", 2);
+
+        if (target.hp <= 0) {
+          eliminateEnemy(target, `${weapon.name} hit ${damage}`);
+        } else {
+          addLog(`${weapon.name} tagged ${target.name} for ${damage}.`);
+        }
+        render();
+      }
+
+      function spendAmmo(weapon) {
+        state.player.ammo = Math.max(0, state.player.ammo - weapon.ammoCost);
+      }
+
+      function nearestVisibleEnemy(range) {
+        return aliveEnemies()
+          .filter((enemy) => distance(state.player, enemy) <= range)
+          .filter((enemy) => !lineBlocked(state.player.x, state.player.y, enemy.x, enemy.y))
+          .sort((a, b) => distance(state.player, a) - distance(state.player, b))[0];
+      }
+
+      function alertNearbyEnemies(radius) {
+        for (const enemy of aliveEnemies()) {
+          if (distance(state.player, enemy) <= radius) enemy.alerted = true;
+        }
+      }
+
+      function throwGrenade() {
+        if (state.mode !== "playing") return;
+        if (state.player.grenades <= 0) {
+          addLog("No grenades left.");
+          render();
+          return;
+        }
+        state.player.grenades -= 1;
+        const visible = nearestVisibleEnemy(9);
+        const target = visible || {
+          x: clamp(state.player.x + state.player.lastDir.x * 5, 1, WIDTH - 2),
+          y: clamp(state.player.y + state.player.lastDir.y * 5, 1, HEIGHT - 2)
+        };
+        addParticle(target.x, target.y, "%", 4);
+        addLog("Frag out. Danger close.");
+
+        for (const enemy of aliveEnemies()) {
+          const blast = distance(target, enemy);
+          if (blast <= 3.2) {
+            const damage = Math.max(18, Math.round(78 - blast * 18));
+            enemy.hp -= damage;
+            enemy.alerted = true;
+            addParticle(enemy.x, enemy.y, "x", 3);
+            if (enemy.hp <= 0) eliminateEnemy(enemy, `Grenade blast ${damage}`);
+            else addLog(`Grenade wounded ${enemy.name} for ${damage}.`);
+          }
+        }
+
+        for (const [wallKey, wall] of [...state.walls.entries()]) {
+          if (distance(target, wall) <= 2.3) damageWall(wallKey, 90);
+        }
+        alertNearbyEnemies(14);
+        render();
+      }
+
+      function buildWall() {
+        if (state.mode !== "playing") return;
+        const player = state.player;
+        const wx = player.x + player.lastDir.x;
+        const wy = player.y + player.lastDir.y;
+        if (!inBounds(wx, wy) || state.walls.has(key(wx, wy)) || isOccupiedByEnemy(wx, wy)) {
+          addLog("Cannot build wall at that position.");
+          render();
+          return;
+        }
+
+        const mat = chooseMaterial();
+        if (!mat) {
+          addLog("No materials to build cover.");
+          render();
+          return;
+        }
+
+        player.materials[mat.name] -= 1;
+        state.walls.set(key(wx, wy), { x: wx, y: wy, hp: mat.hp, material: mat.name });
+        addLog(`Built ${mat.name} wall. Use it to break line of sight.`);
+        render();
+      }
+
+      function chooseMaterial() {
+        const mats = state.player.materials;
+        if (mats.metal > 0) return { name: "metal", hp: 120 };
+        if (mats.stone > 0) return { name: "stone", hp: 85 };
+        if (mats.wood > 0) return { name: "wood", hp: 55 };
+        return null;
+      }
+
+      function useMedkit() {
+        if (state.mode !== "playing") return;
+        const player = state.player;
+        if (player.medkits <= 0) {
+          addLog("No medkits available.");
+        } else if (player.hp >= 100) {
+          addLog("Health already full.");
+        } else {
+          player.medkits -= 1;
+          player.hp = clamp(player.hp + 45, 0, 100);
+          addLog("Medkit used. Health restored.");
+        }
+        render();
+      }
+
+      function swapWeapon(direction) {
+        if (state.mode !== "playing") return;
+        const slots = state.player.weaponSlots;
+        for (let step = 1; step <= slots.length; step += 1) {
+          const next = (state.player.weaponIndex + direction * step + slots.length) % slots.length;
+          if (slots[next]) {
+            state.player.weaponIndex = next;
+            addLog(`${slots[next].name} ready.`);
+            render();
+            return;
+          }
+        }
+      }
+
+      function gameTick() {
+        if (!state || state.mode !== "playing") return;
+        state.tick += 1;
+        state.safe.next -= 1;
+
+        decayParticles();
+
+        if (state.safe.next <= 0) shrinkZone();
+        if (state.tick % 2 === 0) updateEnemies();
+        if (state.tick % 5 === 0 && !insideZone(state.player.x, state.player.y)) {
+          damagePlayer(5, "gas");
+        }
+        if (state.tick % 10 === 0) damageEnemiesOutsideZone();
+        if (state.tick % 70 === 0 && state.loot.length < 44) {
+          spawnLootItem(randomOpenPosition());
+          addLog("A supply cache hit the AO.");
+        }
+
+        checkWinLoss();
+        render();
+      }
+
+      function shrinkZone() {
+        state.safe.radius = Math.max(5, state.safe.radius - 3);
+        state.safe.x = clamp(state.safe.x + randInt(-2, 2), 8, WIDTH - 9);
+        state.safe.y = clamp(state.safe.y + randInt(-1, 1), 6, HEIGHT - 7);
+        state.safe.next = ZONE_SHRINK_TICKS;
+        addLog(`Safe zone shrinking. Radius ${state.safe.radius}. Move.`);
+      }
+
+      function damageEnemiesOutsideZone() {
+        for (const enemy of aliveEnemies()) {
+          if (!insideZone(enemy.x, enemy.y)) {
+            enemy.hp -= 5;
+            enemy.alerted = true;
+            if (enemy.hp <= 0) eliminateEnemy(enemy, "Gas eliminated");
+          }
+        }
+      }
+
+      function updateEnemies() {
+        for (const enemy of aliveEnemies()) {
+          const playerDistance = distance(enemy, state.player);
+          if (playerDistance <= 8 && !lineBlocked(enemy.x, enemy.y, state.player.x, state.player.y)) {
+            enemy.alerted = true;
+          }
+
+          enemy.cooldown = Math.max(0, enemy.cooldown - 1);
+          if (enemy.alerted) {
+            if (playerDistance <= enemy.weapon.range && !lineBlocked(enemy.x, enemy.y, state.player.x, state.player.y)) {
+              enemyShoot(enemy);
+            } else {
+              chasePlayer(enemy);
+            }
+          } else if (state.tick % 6 === 0) {
+            wanderEnemy(enemy);
+          }
+        }
+      }
+
+      function enemyShoot(enemy) {
+        if (enemy.cooldown > 0) return;
+        enemy.cooldown = randInt(4, 8);
+        const damage = randInt(Math.floor(enemy.weapon.damage * 0.35), Math.ceil(enemy.weapon.damage * 0.65));
+        addParticle(state.player.x, state.player.y, "*", 2);
+        damagePlayer(damage, `${enemy.name}'s ${enemy.weapon.name}`);
+      }
+
+      function chasePlayer(enemy) {
+        const options = [
+          { x: Math.sign(state.player.x - enemy.x), y: 0 },
+          { x: 0, y: Math.sign(state.player.y - enemy.y) },
+          { x: -Math.sign(state.player.x - enemy.x), y: 0 },
+          { x: 0, y: -Math.sign(state.player.y - enemy.y) }
+        ].filter((dir) => dir.x !== 0 || dir.y !== 0);
+
+        options.sort((a, b) => {
+          const ad = Math.hypot(enemy.x + a.x - state.player.x, enemy.y + a.y - state.player.y);
+          const bd = Math.hypot(enemy.x + b.x - state.player.x, enemy.y + b.y - state.player.y);
+          return ad - bd;
+        });
+
+        for (const dir of options) {
+          const nx = enemy.x + dir.x;
+          const ny = enemy.y + dir.y;
+          const wallKey = key(nx, ny);
+          if (state.walls.has(wallKey)) {
+            damageWall(wallKey, 16);
+            return;
+          }
+          if (canEnemyMoveTo(nx, ny)) {
+            enemy.x = nx;
+            enemy.y = ny;
+            return;
+          }
+        }
+      }
+
+      function wanderEnemy(enemy) {
+        const dirs = [
+          { x: 1, y: 0 },
+          { x: -1, y: 0 },
+          { x: 0, y: 1 },
+          { x: 0, y: -1 },
+          { x: 0, y: 0 }
+        ].sort(() => Math.random() - 0.5);
+        for (const dir of dirs) {
+          const nx = enemy.x + dir.x;
+          const ny = enemy.y + dir.y;
+          if (canEnemyMoveTo(nx, ny)) {
+            enemy.x = nx;
+            enemy.y = ny;
+            return;
+          }
+        }
+      }
+
+      function canEnemyMoveTo(x, y) {
+        if (!inBounds(x, y)) return false;
+        if (state.walls.has(key(x, y))) return false;
+        if (state.player.x === x && state.player.y === y) return false;
+        return !state.enemies.some((enemy) => enemy.alive && enemy.x === x && enemy.y === y);
+      }
+
+      function damageWall(wallKey, amount) {
+        const wall = state.walls.get(wallKey);
+        if (!wall) return;
+        wall.hp -= amount;
+        if (wall.hp <= 0) {
+          state.walls.delete(wallKey);
+          addLog("Cover destroyed.");
+        }
+      }
+
+      function damagePlayer(amount, source) {
+        const player = state.player;
+        let remaining = amount;
+        if (player.shield > 0) {
+          const absorbed = Math.min(player.shield, remaining);
+          player.shield -= absorbed;
+          remaining -= absorbed;
+        }
+        player.hp = clamp(player.hp - remaining, 0, 100);
+        addLog(`${source} hit you for ${amount}.`);
+        if (player.hp <= 0) {
+          state.mode = "lost";
+          clearInterval(loopId);
+          addLog("KIA. Press R or Deploy to redeploy.");
+        }
+      }
+
+      function eliminateEnemy(enemy, reason) {
+        if (!enemy.alive) return;
+        enemy.alive = false;
+        state.player.kills += 1;
+        addParticle(enemy.x, enemy.y, "x", 4);
+        addLog(`${reason}. ${enemy.name} eliminated.`);
+        if (Math.random() < 0.75) spawnLootItem({ x: enemy.x, y: enemy.y }, pick(["ammo", "materials", "shield", "weapon"]));
+      }
+
+      function checkWinLoss() {
+        if (state.mode !== "playing") return;
+        if (aliveEnemies().length === 0) {
+          state.mode = "won";
+          clearInterval(loopId);
+          addLog("Exfil confirmed. You are the last operator standing.");
+        }
+      }
+
+      function addParticle(x, y, char, life) {
+        if (!inBounds(x, y)) return;
+        state.particles.push({ x, y, char, life });
+      }
+
+      function decayParticles() {
+        state.particles = state.particles
+          .map((particle) => ({ ...particle, life: particle.life - 1 }))
+          .filter((particle) => particle.life > 0);
+      }
+
+      function render() {
+        if (!state || state.mode === "title") {
+          titleScreen();
+          return;
+        }
+
+        const grid = Array.from({ length: HEIGHT }, (_, y) => {
+          return Array.from({ length: WIDTH }, (_, x) => {
+            if (x === 0 || y === 0 || x === WIDTH - 1 || y === HEIGHT - 1) return "X";
+            if (!insideZone(x, y)) return ":";
+            return state.terrain[y][x];
+          });
+        });
+
+        for (const wall of state.walls.values()) grid[wall.y][wall.x] = "#";
+        for (const item of state.loot) grid[item.y][item.x] = item.symbol;
+        for (const enemy of aliveEnemies()) grid[enemy.y][enemy.x] = enemy.alerted ? "!" : "?";
+        for (const particle of state.particles) {
+          if (inBounds(particle.x, particle.y)) grid[particle.y][particle.x] = particle.char;
+        }
+        grid[state.player.y][state.player.x] = "@";
+
+        const header = renderMatchHeader();
+        const rows = grid.map((row) => row.join(""));
+        const footer = state.mode === "won"
+          ? "\nVICTORY: Last operator standing. Press R to run it back."
+          : state.mode === "lost"
+            ? "\nKIA: Press R to redeploy."
+            : "\n";
+        field.textContent = `${header}\n${rows.join("\n")}${footer}`;
+        renderHud();
+      }
+
+      function renderMatchHeader() {
+        const weapon = currentWeapon();
+        const modeText = state.mode === "playing" ? "LIVE FIRE" : state.mode.toUpperCase();
+        return [
+          `MODE ${modeText} | TICK ${state.tick} | KILLS ${state.player.kills} | LEFT ${aliveEnemies().length + 1}`,
+          `ACTIVE ${weapon.name} (${weapon.tag}) | GAS SHRINK IN ${state.safe.next} | RADIUS ${state.safe.radius}`,
+          "-".repeat(WIDTH)
+        ].join("\n");
+      }
+
+      function renderHud() {
+        const player = state.player;
+        hud.hpText.textContent = String(Math.round(player.hp));
+        hud.hpBar.style.width = `${player.hp}%`;
+        hud.shieldText.textContent = String(Math.round(player.shield));
+        hud.shieldBar.style.width = `${player.shield}%`;
+        hud.ammoText.textContent = String(player.ammo);
+        hud.medkitText.textContent = String(player.medkits);
+        hud.grenadeText.textContent = String(player.grenades);
+        hud.materialText.textContent = `W${player.materials.wood} / S${player.materials.stone} / M${player.materials.metal}`;
+        hud.leftText.textContent = String(aliveEnemies().length + (player.hp > 0 ? 1 : 0));
+        hud.zoneText.textContent = `${state.safe.next} ticks / R${state.safe.radius}`;
+        statusLine.textContent = state.mode === "playing"
+          ? "AO hot - terminal uplink active"
+          : state.mode === "won"
+            ? "Victory confirmed"
+            : "Operator down";
+        logPanel.textContent = state.logs.join("\n") || "No traffic.";
+        renderWeaponList();
+      }
+
+      function renderWeaponList() {
+        hud.weaponList.innerHTML = "";
+        state.player.weaponSlots.forEach((weapon, index) => {
+          const slot = document.createElement("div");
+          slot.className = `weapon-slot${index === state.player.weaponIndex ? " active" : ""}`;
+          const name = weapon ? weapon.name : "Empty";
+          const meta = weapon ? `DMG ${weapon.damage} RNG ${weapon.range}` : "--";
+          slot.innerHTML = `<span>${index + 1}. ${name}</span><span>${meta}</span>`;
+          hud.weaponList.appendChild(slot);
+        });
+      }
+
+      function handleKey(event) {
+        const keyName = event.key.toLowerCase();
+        const gameKeys = ["w", "a", "s", "d", "f", "b", "g", "h", "q", "e", "r", "enter", " "];
+        if (gameKeys.includes(keyName)) event.preventDefault();
+
+        if (!state || state.mode === "title") {
+          if (keyName === "enter" || keyName === " ") startGame();
+          return;
+        }
+
+        if (state.mode !== "playing") {
+          if (keyName === "r" || keyName === "enter" || keyName === " ") startGame();
+          return;
+        }
+
+        if (keyName === "w") movePlayer(0, -1);
+        else if (keyName === "s") movePlayer(0, 1);
+        else if (keyName === "a") movePlayer(-1, 0);
+        else if (keyName === "d") movePlayer(1, 0);
+        else if (keyName === "f") shoot();
+        else if (keyName === "b") buildWall();
+        else if (keyName === "g") throwGrenade();
+        else if (keyName === "h") useMedkit();
+        else if (keyName === "q") swapWeapon(-1);
+        else if (keyName === "e") swapWeapon(1);
+      }
+
+      deployBtn.addEventListener("click", startGame);
+      window.addEventListener("keydown", handleKey);
+
+      state = { mode: "title" };
+      titleScreen();
+    })();
+  </script>
 </body>
 </html>
